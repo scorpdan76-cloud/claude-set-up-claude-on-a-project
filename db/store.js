@@ -17,6 +17,26 @@ function getUserById(id) {
   return users.find((user) => user.id === id);
 }
 
+// Optionally filters by a case-insensitive partial match on name or email,
+// then returns one page of the results plus the total number of matches.
+function findUsers({ query, limit = Infinity, offset = 0 } = {}) {
+  let matches = users;
+
+  if (query) {
+    const term = query.toLowerCase();
+    matches = users.filter(
+      (user) =>
+        user.name.toLowerCase().includes(term) ||
+        user.email.toLowerCase().includes(term)
+    );
+  }
+
+  return {
+    users: matches.slice(offset, offset + limit),
+    total: matches.length,
+  };
+}
+
 function createUser({ name, email }) {
   const user = { id: nextId, name, email };
   nextId += 1;
@@ -24,4 +44,4 @@ function createUser({ name, email }) {
   return user;
 }
 
-module.exports = { getAllUsers, getUserById, createUser };
+module.exports = { getAllUsers, getUserById, findUsers, createUser };
